@@ -1100,6 +1100,19 @@ impl BtvDecelScheduler {
         self.compute_decel(ground_speed);
 
         self.state = self.update_state(ground_speed);
+
+        println!(
+            "BTV gndspeed {:.0} decel {:.2}",
+            ground_speed.get::<knot>(),
+            self.actual_deceleration.get::<meter_per_second_squared>()
+        );
+
+        println!(
+            "BTV STATE {:?}, desired decel {:.0} requested decel {:.2}",
+            self.state,
+            self.desired_deceleration.get::<meter_per_second_squared>(),
+            self.deceleration_request.get::<meter_per_second_squared>()
+        );
     }
 
     fn braking_distance_remaining(&self) -> Length {
@@ -1108,6 +1121,12 @@ impl BtvDecelScheduler {
         } else {
             self.oans_distance_to_exit.value()
         };
+        println!(
+            "BRAKING DISTANCE: OANS INPUT {:.0}m , final {:.0}m Runway end{:.0}m",
+            self.oans_distance_to_exit.value().get::<meter>(),
+            distance_remaining_raw.get::<meter>(),
+            self.distance_to_rwy_end.get::<meter>(),
+        );
 
         let distance_from_btv_exit = Length::new::<meter>(Self::DISTANCE_OFFSET_TO_RELEASE_BTV_M);
 
