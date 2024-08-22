@@ -51,12 +51,6 @@ impl A380AuxiliaryGearDoor {
 
             self.position = Ratio::new::<ratio>(self.position.get::<ratio>().clamp(0., 1.));
         }
-
-        println!(
-            "GEAR DOOR POS = {:.2}, shouldOpen {:?}",
-            self.position.get::<ratio>(),
-            lgciu.main_down_and_locked() && lgciu.gear_handle_is_down()
-        );
     }
 }
 impl SimulationElement for A380AuxiliaryGearDoor {
