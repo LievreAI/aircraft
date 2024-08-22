@@ -90,7 +90,7 @@ export class BrakeToVacateUtils<T extends number> {
     this.liveStoppingDistance.setConsumer(sub.on('stopBarDistance').whenChanged());
     this.radioAltitude1.setConsumer(sub.on('radioAltitude_1').whenChanged());
     this.radioAltitude2.setConsumer(sub.on('radioAltitude_2').whenChanged());
-    this.fmgcFlightPhase.setConsumer(sub.on('fmgcFlightPhase').whenChanged());
+    this.fwsFlightPhase.setConsumer(sub.on('fwcFlightPhase').whenChanged());
     sub
       .on('groundSpeed')
       .atFrequency(2)
@@ -162,7 +162,7 @@ export class BrakeToVacateUtils<T extends number> {
 
   private readonly radioAltitude2 = ConsumerSubject.create(null, 0);
 
-  private readonly fmgcFlightPhase = ConsumerSubject.create(null, 0);
+  private readonly fwsFlightPhase = ConsumerSubject.create(null, 0);
 
   selectRunwayFromOans(
     runway: string,
@@ -185,7 +185,6 @@ export class BrakeToVacateUtils<T extends number> {
     } else {
       this.btvOppositeThresholdPosition = lastEl;
     }
-    console.log('threshold positions:', this.btvThresholdPosition, this.btvOppositeThresholdPosition);
 
     // Derive LDA from geometry (if we take the LDA database value, there might be drawing errors)
     const lda = dist1 > dist2 ? dist1 : dist2;
@@ -207,6 +206,10 @@ export class BrakeToVacateUtils<T extends number> {
   }
 
   selectExitFromOans(exit: string, feature: Feature<Geometry, AmdbProperties>) {
+    if (this.btvRunway.get() == null) {
+      return;
+    }
+
     const thrLoc = this.btvThresholdPosition;
     const exitLastIndex = feature.geometry.coordinates.length - 1;
     const exitLoc1 = feature.geometry.coordinates[0] as Position;
@@ -269,8 +272,6 @@ export class BrakeToVacateUtils<T extends number> {
     } else {
       this.btvPathGeometry.push(thrLoc);
     }
-
-    console.log('btv exit position: ', this.btvExitPosition);
 
     this.btvExitDistance.set(exitDistance);
     this.btvExit.set(exit);
@@ -357,8 +358,9 @@ export class BrakeToVacateUtils<T extends number> {
 
     if (
       (!ra1.isNormalOperation() && !ra2.isNormalOperation()) ||
-      (ra1.isNormalOperation() ? ra1.value : ra2.value > 600) ||
-      this.fmgcFlightPhase.get() !== 5
+      (ra1.isNormalOperation() ? ra1.value : ra2.value) > 600 ||
+      this.fwsFlightPhase.get() < 6 ||
+      this.fwsFlightPhase.get() > 9
     ) {
       this.remaininingDistToRwyEnd.set(-1);
       this.remaininingDistToExit.set(-1);
