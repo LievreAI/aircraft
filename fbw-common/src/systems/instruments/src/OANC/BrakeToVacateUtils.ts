@@ -185,6 +185,7 @@ export class BrakeToVacateUtils<T extends number> {
     } else {
       this.btvOppositeThresholdPosition = lastEl;
     }
+    console.log('threshold positions:', this.btvThresholdPosition, this.btvOppositeThresholdPosition);
 
     // Derive LDA from geometry (if we take the LDA database value, there might be drawing errors)
     const lda = dist1 > dist2 ? dist1 : dist2;
@@ -268,6 +269,8 @@ export class BrakeToVacateUtils<T extends number> {
     } else {
       this.btvPathGeometry.push(thrLoc);
     }
+
+    console.log('btv exit position: ', this.btvExitPosition);
 
     this.btvExitDistance.set(exitDistance);
     this.btvExit.set(exit);
